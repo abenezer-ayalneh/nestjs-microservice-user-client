@@ -5,15 +5,17 @@ import {
   RpcException,
   Transport,
 } from '@nestjs/microservices';
+import { join } from 'path';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
     {
-      transport: Transport.TCP,
+      transport: Transport.GRPC,
       options: {
-        port: 3005,
+        package: 'user',
+        protoPath: join(__dirname, 'proto/user.proto'),
       },
     },
   );
@@ -27,7 +29,7 @@ async function bootstrap() {
             message: error.constraints
               ? Object.values(error.constraints)[0]
               : null,
-            statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+            code: HttpStatus.UNPROCESSABLE_ENTITY,
             errors: error.constraints ? Object.values(error.constraints) : null,
           });
         });
