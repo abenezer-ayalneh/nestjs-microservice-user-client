@@ -1,50 +1,54 @@
+import { status as GrpcStatus } from '@grpc/grpc-js';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Surreal, { Result } from 'surrealdb.js';
-import { StoreUserRequest } from './requests/user.request';
-import { status as GrpcStatus } from '@grpc/grpc-js';
 import { RpcException } from '@nestjs/microservices';
-import * as argon from 'argon2';
+import { Cirql, select, update } from 'cirql';
 import { ValidationMessages } from 'src/custom/maps/validation.maps';
+import { User } from 'src/custom/models/user.model';
+import { StoreUserRequest } from './requests/user.request';
+import * as argon from 'argon2';
 
 @Injectable()
 export class UserService {
-  private db: Surreal;
+  private db: Cirql;
   constructor(private config: ConfigService) {
-    this.db = new Surreal(config.get<string>('SURREAL_DB_URL'));
-  }
-
-  async storeUser(request: StoreUserRequest) {
-    try {
-      await this.db.signin({
+    this.db = new Cirql({
+      connection: {
+        endpoint: this.config.get<string>('SURREAL_DB_URL'),
+        namespace: this.config.get<string>('SURREAL_DB_NAMESPACE'),
+        database: this.config.get<string>('SURREAL_DB_DATABASE'),
+      },
+      credentials: {
         user: this.config.get<string>('SURREAL_DB_USER'),
         pass: this.config.get<string>('SURREAL_DB_PASSWORD'),
+      },
+    });
+  }
+
+  async checkUser(request: StoreUserRequest) {
+    try {
+      await this.db.ready();
+      const userCheckResult = await this.db.execute({
+        query: select().from('users').where({ email: request.email }),
+        schema: User,
       });
-
-      // Select a specific namespace / database
-      await this.db.use(
-        this.config.get<string>('SURREAL_DB_NAMESPACE'),
-        this.config.get<string>('SURREAL_DB_DATABASE'),
-      );
-
-      const userCheckResult = await this.db.query<Result>(
-        `SELECT * from users where email = $email;`,
-        { email: request.email },
-      );
-
-      console.log(userCheckResult[0].result);
 
       if (
         typeof userCheckResult[0] !== 'undefined' &&
-        userCheckResult[0].result.length !== 0
+        userCheckResult.length > 0
       ) {
         const token = await argon.hash(request.password);
-        const user = await this.db.update('users', {
-          email: request.email,
-          accessToken: token,
+        const user = await this.db.execute({
+          schema: User,
+          query: update('users').set('password', token),
         });
 
-        return user[0];
+        return {
+          id: user[0].id,
+          email: user[0].email,
+          name: user[0].name,
+          password: user[0].password,
+        };
       } else {
         throw new RpcException({
           message: ValidationMessages.USER_DOES_NOT_EXISTS,

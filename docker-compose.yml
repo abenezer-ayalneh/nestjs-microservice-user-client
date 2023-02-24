@@ -22,6 +22,7 @@ services:
     volumes:
       - ./data/db/surrealdb.db:/database.db
     restart: always
+    # docker exec -it surrealdb /surreal sql -c http://localhost:8000 -u root -p root --ns test --db test --pretty
   # pd0:
   #   container_name: surrealdb-pd0
   #   image: pingcap/pd:v6.1.0

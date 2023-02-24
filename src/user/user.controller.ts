@@ -7,8 +7,8 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @GrpcMethod('UserGrpcService', 'StoreUser')
-  storeUser(request: StoreUserRequest) {
-    return this.userService.storeUser(request);
+  @GrpcMethod('UserGrpcService', 'CheckUser')
+  checkUser(request: StoreUserRequest) {
+    return this.userService.checkUser(request);
   }
 }
