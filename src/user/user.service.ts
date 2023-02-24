@@ -34,20 +34,14 @@ export class UserService {
       });
 
       if (
-        typeof userCheckResult[0] !== 'undefined' &&
-        userCheckResult.length > 0
+        userCheckResult.length > 0 &&
+        typeof userCheckResult[0] !== 'undefined'
       ) {
-        const token = await argon.hash(request.password);
-        const user = await this.db.execute({
-          schema: User,
-          query: update('users').set('password', token),
-        });
-
         return {
-          id: user[0].id,
-          email: user[0].email,
-          name: user[0].name,
-          password: user[0].password,
+          id: userCheckResult[0].id,
+          email: userCheckResult[0].email,
+          name: userCheckResult[0].name,
+          password: userCheckResult[0].password,
         };
       } else {
         throw new RpcException({
