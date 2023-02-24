@@ -1,9 +1,11 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Surreal, { Result } from 'surrealdb.js';
-import * as argon from 'argon2';
 import { StoreUserRequest } from './requests/user.request';
+import { status as GrpcStatus } from '@grpc/grpc-js';
 import { RpcException } from '@nestjs/microservices';
+import * as argon from 'argon2';
+import { ValidationMessages } from 'src/custom/maps/validation.maps';
 
 @Injectable()
 export class UserService {
@@ -25,31 +27,35 @@ export class UserService {
         this.config.get<string>('SURREAL_DB_DATABASE'),
       );
 
-      const userCheckResult = await this.db.query<Result<any>>(
-        'SELECT * from users where email = $email',
+      const userCheckResult = await this.db.query<Result>(
+        `SELECT * from users where email = $email;`,
         { email: request.email },
       );
 
-      //   console.log(userCheckResult[0].result.length === 0);
+      console.log(userCheckResult[0].result);
 
-      if (userCheckResult.result.length === 0) {
+      if (
+        typeof userCheckResult[0] !== 'undefined' &&
+        userCheckResult[0].result.length !== 0
+      ) {
         const token = await argon.hash(request.password);
-
-        const user = await this.db.create('users', {
+        const user = await this.db.update('users', {
           email: request.email,
           accessToken: token,
         });
 
-        console.log(user);
-        return user;
+        return user[0];
       } else {
         throw new RpcException({
-          message: 'validation.USER_EXISTS',
-          code: HttpStatus.UNPROCESSABLE_ENTITY,
+          message: ValidationMessages.USER_DOES_NOT_EXISTS,
+          code: GrpcStatus.INVALID_ARGUMENT,
         });
       }
     } catch (error) {
-      console.error(error);
+      throw new RpcException({
+        message: error.message ?? ValidationMessages.SOMETHING_WENT_WRONG,
+        code: GrpcStatus.INTERNAL,
+      });
     }
   }
 }

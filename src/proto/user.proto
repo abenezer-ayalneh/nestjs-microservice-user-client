@@ -14,4 +14,5 @@ message StoreUserRequest {
 message StoreUserReturn {
   string id = 1;
   string email = 2;
+  string accessToken = 3;
 }
