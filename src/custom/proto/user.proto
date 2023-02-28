@@ -7,6 +7,39 @@ service UserGrpcService {
   rpc CheckUser (CheckUserRequest) returns (CheckUserReturn) {}
   rpc UpdateUser (UpdateUserRequest) returns (UpdateUserReturn) {}
   rpc DeleteUser (DeleteUserRequest) returns (DeleteUserReturn) {}
+  rpc CreateRole (CreateRoleRequest) returns (CreateRoleReturn) {}
+  rpc UpdateRole (UpdateRoleRequest) returns (UpdateRoleReturn) {}
+  rpc DeleteRole (DeleteRoleRequest) returns (DeleteRoleReturn) {}
+}
+
+// Delete role
+message DeleteRoleRequest {
+  string id = 1;
+}
+
+message DeleteRoleReturn {
+  string message = 1;
+}
+
+// Update role
+message UpdateRoleRequest {
+  string id = 1;
+  optional string name = 2;
+  optional string description = 3;
+}
+
+message UpdateRoleReturn {
+  string message = 1;
+}
+
+// Create role
+message CreateRoleRequest {
+  string name = 1;
+  optional string description = 2;
+}
+
+message CreateRoleReturn {
+  string message = 1;
 }
 
 // Delete user

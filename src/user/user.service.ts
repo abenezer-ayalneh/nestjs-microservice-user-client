@@ -2,16 +2,23 @@ import { status as GrpcStatus } from '@grpc/grpc-js';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
-import { Cirql, create, select, update, delRecord, del } from 'cirql';
+import { Cirql, create, del, delRecord, eq, select, update } from 'cirql';
+import { time } from 'cirql';
 import { SuccessMessages } from 'src/custom/maps/success.maps';
 import { ValidationMessages } from 'src/custom/maps/validation.maps';
+import { Role } from 'src/custom/models/role.model';
 import { User } from 'src/custom/models/user.model';
 import {
   CheckUserRequest,
-  UpdateUserRequest,
+  CreateRoleRequest,
+  DeleteRoleRequest,
   DeleteUserRequest,
+  UpdateUserRequest,
 } from 'src/custom/requests/user.request';
-import { StoreUserRequest } from '../custom/requests/user.request';
+import {
+  StoreUserRequest,
+  UpdateRoleRequest,
+} from '../custom/requests/user.request';
 
 @Injectable()
 export class UserService {
@@ -30,8 +37,126 @@ export class UserService {
     });
   }
 
+  // Access service methods
+  async deleteRole(request: DeleteRoleRequest) {
+    // TODO Delete the role here
+    try {
+      const roleFromDb = await this.db.execute({
+        query: select().from('roles').where({ id: request.id }),
+        schema: Role,
+      });
+
+      if (roleFromDb.length === 0) {
+        throw new RpcException({
+          message: ValidationMessages.ROLE_EXISTS,
+          code: GrpcStatus.UNKNOWN,
+        });
+      } else {
+        await this.db.execute({
+          query: delRecord(request.id),
+          schema: Role,
+        });
+
+        return {
+          message: SuccessMessages.ROLE_CREATED_SUCCESSFULLY,
+        };
+      }
+    } catch (error) {
+      console.error(error);
+      if (error instanceof RpcException) {
+        throw error;
+      } else {
+        throw new RpcException({
+          message: error.message ?? ValidationMessages.SOMETHING_WENT_WRONG,
+          code: GrpcStatus.INTERNAL,
+        });
+      }
+    }
+  }
+
+  async createRole(request: CreateRoleRequest) {
+    // TODO Update the role here
+    try {
+      const roleFromDb = await this.db.execute({
+        query: select().from('roles').where({ name: request.name }),
+        schema: Role,
+      });
+
+      if (roleFromDb.length === 0) {
+        await this.db.execute({
+          query: create('roles').setAll({
+            ...request,
+            created_at: eq(time.now()),
+          }),
+          schema: Role,
+        });
+
+        return {
+          message: SuccessMessages.ROLE_CREATED_SUCCESSFULLY,
+        };
+      } else {
+        throw new RpcException({
+          message: ValidationMessages.ROLE_EXISTS,
+          code: GrpcStatus.UNKNOWN,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      if (error instanceof RpcException) {
+        throw error;
+      } else {
+        throw new RpcException({
+          message: error.message ?? ValidationMessages.SOMETHING_WENT_WRONG,
+          code: GrpcStatus.INTERNAL,
+        });
+      }
+    }
+  }
+
+  async updateRole(request: UpdateRoleRequest) {
+    // TODO Create the role here
+    try {
+      const roleFromDb = await this.db.execute({
+        query: select().from('roles').where({ id: request.id }),
+        schema: Role,
+      });
+
+      if (roleFromDb.length === 0) {
+        throw new RpcException({
+          message: ValidationMessages.ROLE_NOT_FOUND,
+          code: GrpcStatus.UNKNOWN,
+        });
+      } else {
+        const { id, ...requestWithoutId } = request;
+        await this.db.execute({
+          query: update('roles')
+            .where({ id: id })
+            .setAll({
+              ...requestWithoutId,
+              updated_at: eq(time.now()),
+            }),
+          schema: Role,
+        });
+
+        return {
+          message: SuccessMessages.ROLE_CREATED_SUCCESSFULLY,
+        };
+      }
+    } catch (error) {
+      console.error(error);
+      if (error instanceof RpcException) {
+        throw error;
+      } else {
+        throw new RpcException({
+          message: error.message ?? ValidationMessages.SOMETHING_WENT_WRONG,
+          code: GrpcStatus.INTERNAL,
+        });
+      }
+    }
+  }
+
+  // User service methods
   async deleteUser(request: DeleteUserRequest) {
-    // TODO Delete user here
     try {
       const userFromDb = await this.db.execute({
         query: select().from('users').where({ id: request.id }),
@@ -45,8 +170,11 @@ export class UserService {
         });
       } else {
         // console.log(request);
+        const { id } = request;
         await this.db.execute({
-          query: del('users').where({ id: request.id }),
+          query: update('users')
+            .where({ id: id })
+            .set('deleted_at', eq(time.now())),
           schema: User,
         });
 
@@ -81,8 +209,11 @@ export class UserService {
         });
       } else {
         // console.log(request);
+        const { id, ...requestWithoutId } = request;
         await this.db.execute({
-          query: update('users').where({ id: request.id }).setAll(request),
+          query: update('users')
+            .where({ id: id })
+            .setAll({ ...requestWithoutId }),
           schema: User,
         });
 
@@ -112,7 +243,7 @@ export class UserService {
 
       if (userFromDb.length === 0) {
         await this.db.execute({
-          query: create('users').setAll({ email: request.email }),
+          query: create('users').setAll(request),
           schema: User,
         });
 

@@ -8,6 +8,37 @@ import {
 } from 'class-validator';
 import { ValidationMessages } from '../maps/validation.maps';
 
+// Access Requests
+export class CreateRoleRequest {
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsOptional()
+  name: string;
+
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsOptional()
+  description: string;
+}
+
+export class DeleteRoleRequest {
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
+  id: string;
+}
+export class UpdateRoleRequest {
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
+  id: string;
+
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
+  name: string;
+
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsOptional()
+  description: string;
+}
+
+// User requests
 export class CheckUserRequest {
   @IsEmail({}, { message: ValidationMessages.TARGET_SHOULD_BE_VALID })
   @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
