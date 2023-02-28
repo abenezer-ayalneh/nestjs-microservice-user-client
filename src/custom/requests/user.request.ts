@@ -197,3 +197,9 @@ export class UpdateUserRequest {
   @IsOptional()
   messenger_color: string;
 }
+
+export class DeleteUserRequest {
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
+  id: string;
+}

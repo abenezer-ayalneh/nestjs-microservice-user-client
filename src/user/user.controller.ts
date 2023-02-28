@@ -2,6 +2,7 @@ import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import {
   CheckUserRequest,
+  DeleteUserRequest,
   StoreUserRequest,
   UpdateUserRequest,
 } from '../custom/requests/user.request';
@@ -24,5 +25,10 @@ export class UserController {
   @GrpcMethod('UserGrpcService', 'UpdateUser')
   updateUser(request: UpdateUserRequest) {
     return this.userService.updateUser(request);
+  }
+
+  @GrpcMethod('UserGrpcService', 'DeleteUser')
+  deleteUser(request: DeleteUserRequest) {
+    return this.userService.deleteUser(request);
   }
 }

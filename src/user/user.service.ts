@@ -2,13 +2,14 @@ import { status as GrpcStatus } from '@grpc/grpc-js';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
-import { Cirql, create, select, update } from 'cirql';
+import { Cirql, create, select, update, delRecord, del } from 'cirql';
 import { SuccessMessages } from 'src/custom/maps/success.maps';
 import { ValidationMessages } from 'src/custom/maps/validation.maps';
 import { User } from 'src/custom/models/user.model';
 import {
   CheckUserRequest,
   UpdateUserRequest,
+  DeleteUserRequest,
 } from 'src/custom/requests/user.request';
 import { StoreUserRequest } from '../custom/requests/user.request';
 
@@ -29,8 +30,44 @@ export class UserService {
     });
   }
 
+  async deleteUser(request: DeleteUserRequest) {
+    // TODO Delete user here
+    try {
+      const userFromDb = await this.db.execute({
+        query: select().from('users').where({ id: request.id }),
+        schema: User,
+      });
+
+      if (userFromDb.length === 0) {
+        throw new RpcException({
+          message: ValidationMessages.USER_DOES_NOT_EXISTS,
+          code: GrpcStatus.UNKNOWN,
+        });
+      } else {
+        // console.log(request);
+        await this.db.execute({
+          query: del('users').where({ id: request.id }),
+          schema: User,
+        });
+
+        return {
+          message: SuccessMessages.USER_DELETED_SUCCESSFULLY,
+        };
+      }
+    } catch (error) {
+      console.error(error);
+      if (error instanceof RpcException) {
+        throw error;
+      } else {
+        throw new RpcException({
+          message: error.message ?? ValidationMessages.SOMETHING_WENT_WRONG,
+          code: GrpcStatus.INTERNAL,
+        });
+      }
+    }
+  }
+
   async updateUser(request: UpdateUserRequest) {
-    // TODO Update user here
     try {
       const userFromDb = await this.db.execute({
         query: select().from('users').where({ id: request.id }),

@@ -6,6 +6,16 @@ service UserGrpcService {
   rpc StoreUser (StoreUserRequest) returns (StoreUserReturn) {}
   rpc CheckUser (CheckUserRequest) returns (CheckUserReturn) {}
   rpc UpdateUser (UpdateUserRequest) returns (UpdateUserReturn) {}
+  rpc DeleteUser (DeleteUserRequest) returns (DeleteUserReturn) {}
+}
+
+// Delete user
+message DeleteUserRequest {
+  string id = 1;
+}
+
+message DeleteUserReturn {
+  string message = 1;
 }
 
 // Update user
