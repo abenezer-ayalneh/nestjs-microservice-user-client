@@ -103,3 +103,97 @@ export class StoreUserRequest {
   @IsOptional()
   messenger_color: string = null;
 }
+
+export class UpdateUserRequest {
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
+  id: string;
+
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsOptional()
+  name: string;
+
+  @IsEmail({}, { message: ValidationMessages.TARGET_SHOULD_BE_VALID })
+  @IsOptional()
+  email: string;
+
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsOptional()
+  password: string;
+
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsOptional()
+  email_verified_at: string;
+
+  @IsNumber({}, { message: ValidationMessages.TARGET_SHOULD_BE_NUMBER })
+  @IsOptional()
+  plan: number;
+
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsOptional()
+  plan_expire_date: string;
+
+  @IsNumber({}, { message: ValidationMessages.TARGET_SHOULD_BE_NUMBER })
+  @IsOptional()
+  requested_plan;
+
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsOptional()
+  type: string;
+
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsOptional()
+  avatar: string;
+
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsOptional()
+  lang: string;
+
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsOptional()
+  mode;
+
+  @IsNumber({}, { message: ValidationMessages.TARGET_SHOULD_BE_NUMBER })
+  @IsOptional()
+  created_by;
+
+  @IsNumber({}, { message: ValidationMessages.TARGET_SHOULD_BE_NUMBER })
+  @IsOptional()
+  default_pipeline: number;
+
+  @IsNumber({}, { message: ValidationMessages.TARGET_SHOULD_BE_NUMBER })
+  @IsOptional()
+  delete_status;
+
+  @IsBoolean({ message: ValidationMessages.TARGET_SHOULD_BE_BOOLEAN })
+  @IsOptional()
+  is_active;
+
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsOptional()
+  remember_token: string;
+
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsOptional()
+  last_login_at: string;
+
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsOptional()
+  created_at: string;
+
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsOptional()
+  updated_at: string;
+
+  @IsNumber({}, { message: ValidationMessages.TARGET_SHOULD_BE_NUMBER })
+  @IsOptional()
+  active_status;
+
+  @IsNumber({}, { message: ValidationMessages.TARGET_SHOULD_BE_NUMBER })
+  @IsOptional()
+  dark_mode;
+
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsOptional()
+  messenger_color: string;
+}

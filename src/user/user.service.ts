@@ -1,13 +1,16 @@
 import { status as GrpcStatus } from '@grpc/grpc-js';
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
 import { Cirql, create, select, update } from 'cirql';
+import { SuccessMessages } from 'src/custom/maps/success.maps';
 import { ValidationMessages } from 'src/custom/maps/validation.maps';
 import { User } from 'src/custom/models/user.model';
+import {
+  CheckUserRequest,
+  UpdateUserRequest,
+} from 'src/custom/requests/user.request';
 import { StoreUserRequest } from '../custom/requests/user.request';
-import * as argon from 'argon2';
-import { SuccessMessages } from 'src/custom/maps/success.maps';
 
 @Injectable()
 export class UserService {
@@ -24,6 +27,43 @@ export class UserService {
         pass: this.config.get<string>('SURREAL_DB_PASSWORD'),
       },
     });
+  }
+
+  async updateUser(request: UpdateUserRequest) {
+    // TODO Update user here
+    try {
+      const userFromDb = await this.db.execute({
+        query: select().from('users').where({ id: request.id }),
+        schema: User,
+      });
+
+      if (userFromDb.length === 0) {
+        throw new RpcException({
+          message: ValidationMessages.USER_DOES_NOT_EXISTS,
+          code: GrpcStatus.UNKNOWN,
+        });
+      } else {
+        // console.log(request);
+        await this.db.execute({
+          query: update('users').where({ id: request.id }).setAll(request),
+          schema: User,
+        });
+
+        return {
+          message: SuccessMessages.USER_UPDATED_SUCCESSFULLY,
+        };
+      }
+    } catch (error) {
+      console.error(error);
+      if (error instanceof RpcException) {
+        throw error;
+      } else {
+        throw new RpcException({
+          message: error.message ?? ValidationMessages.SOMETHING_WENT_WRONG,
+          code: GrpcStatus.INTERNAL,
+        });
+      }
+    }
   }
 
   async storeUser(request: StoreUserRequest) {
@@ -61,7 +101,7 @@ export class UserService {
     }
   }
 
-  async checkUser(request: StoreUserRequest) {
+  async checkUser(request: CheckUserRequest) {
     try {
       await this.db.ready();
       const userCheckResult = await this.db.execute({
@@ -86,10 +126,15 @@ export class UserService {
         });
       }
     } catch (error) {
-      throw new RpcException({
-        message: error.message ?? ValidationMessages.SOMETHING_WENT_WRONG,
-        code: GrpcStatus.INTERNAL,
-      });
+      console.error(error);
+      if (error instanceof RpcException) {
+        throw error;
+      } else {
+        throw new RpcException({
+          message: error.message ?? ValidationMessages.SOMETHING_WENT_WRONG,
+          code: GrpcStatus.INTERNAL,
+        });
+      }
     }
   }
 }

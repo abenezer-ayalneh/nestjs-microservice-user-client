@@ -5,19 +5,38 @@ package user;
 service UserGrpcService {
   rpc StoreUser (StoreUserRequest) returns (StoreUserReturn) {}
   rpc CheckUser (CheckUserRequest) returns (CheckUserReturn) {}
+  rpc UpdateUser (UpdateUserRequest) returns (UpdateUserReturn) {}
 }
 
-// Check user
-message CheckUserRequest {
-  string email = 1;
-
+// Update user
+message UpdateUserRequest {
+  string id = 1;
+  optional string name = 2;
+  optional string email = 3;
+  optional string email_verified_at = 4;
+  optional string password = 5;
+  optional int32 plan = 6;
+  optional string plan_expire_date = 7;
+  optional int32 requested_plan = 8;
+  optional string type = 9;
+  optional string avatar = 10;
+  optional string lang = 11;
+  optional string mode = 12;
+  optional int32 created_by = 13;
+  optional int32 default_pipeline = 14;
+  optional int32 delete_status = 15;
+  optional bool is_active = 16;
+  optional string remember_token = 17;
+  optional string last_login_at = 18;
+  optional string created_at = 19;
+  optional string updated_at = 20;
+  optional int32 active_status = 21;
+  optional int32 dark_mode = 22;
+  optional string messenger_color = 23;
 }
 
-message CheckUserReturn {
-  int32 id = 1;
-  string name = 2;
-  string email = 3;
-  string password = 4;
+message UpdateUserReturn {
+  string message = 1;
 }
 
 // Store user request
@@ -48,4 +67,17 @@ message StoreUserRequest {
 
 message StoreUserReturn {
   string message = 1;
+}
+
+// Check user
+message CheckUserRequest {
+  string email = 1;
+
+}
+
+message CheckUserReturn {
+  int32 id = 1;
+  string name = 2;
+  string email = 3;
+  string password = 4;
 }
