@@ -1,12 +1,13 @@
 import { status as GrpcStatus } from '@grpc/grpc-js';
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
-import { Cirql, select, update } from 'cirql';
+import { Cirql, create, select, update } from 'cirql';
 import { ValidationMessages } from 'src/custom/maps/validation.maps';
 import { User } from 'src/custom/models/user.model';
-import { StoreUserRequest } from './requests/user.request';
+import { StoreUserRequest } from '../custom/requests/user.request';
 import * as argon from 'argon2';
+import { SuccessMessages } from 'src/custom/maps/success.maps';
 
 @Injectable()
 export class UserService {
@@ -23,6 +24,41 @@ export class UserService {
         pass: this.config.get<string>('SURREAL_DB_PASSWORD'),
       },
     });
+  }
+
+  async storeUser(request: StoreUserRequest) {
+    try {
+      const userFromDb = await this.db.execute({
+        query: select().from('users').where({ email: request.email }),
+        schema: User,
+      });
+
+      if (userFromDb.length === 0) {
+        await this.db.execute({
+          query: create('users').setAll({ email: request.email }),
+          schema: User,
+        });
+
+        return {
+          message: SuccessMessages.USER_CREATED_SUCCESSFULLY,
+        };
+      } else {
+        throw new RpcException({
+          message: ValidationMessages.USER_EXISTS,
+          code: GrpcStatus.UNKNOWN,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      if (error instanceof RpcException) {
+        throw error;
+      } else {
+        throw new RpcException({
+          message: error.message ?? ValidationMessages.SOMETHING_WENT_WRONG,
+          code: GrpcStatus.INTERNAL,
+        });
+      }
+    }
   }
 
   async checkUser(request: StoreUserRequest) {

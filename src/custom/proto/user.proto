@@ -3,12 +3,14 @@ syntax = "proto3";
 package user;
 
 service UserGrpcService {
+  rpc StoreUser (StoreUserRequest) returns (StoreUserReturn) {}
   rpc CheckUser (CheckUserRequest) returns (CheckUserReturn) {}
 }
 
+// Check user
 message CheckUserRequest {
   string email = 1;
-  string password = 2;
+
 }
 
 message CheckUserReturn {
@@ -16,4 +18,34 @@ message CheckUserReturn {
   string name = 2;
   string email = 3;
   string password = 4;
+}
+
+// Store user request
+message StoreUserRequest {
+  optional string name = 1;
+  string email = 2;
+  optional string email_verified_at = 3;
+  optional string password = 4;
+  optional int32 plan = 5;
+  optional string plan_expire_date = 6;
+  optional int32 requested_plan = 7;
+  optional string type = 8;
+  optional string avatar = 9;
+  optional string lang = 10;
+  optional string mode = 11;
+  optional int32 created_by = 12;
+  optional int32 default_pipeline = 13;
+  optional int32 delete_status = 14;
+  optional bool is_active = 15;
+  optional string remember_token = 16;
+  optional string last_login_at = 17;
+  optional string created_at = 18;
+  optional string updated_at = 19;
+  optional int32 active_status = 20;
+  optional int32 dark_mode = 21;
+  optional string messenger_color = 22;
+}
+
+message StoreUserReturn {
+  string message = 1;
 }
