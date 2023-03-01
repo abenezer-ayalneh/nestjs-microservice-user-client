@@ -1,4 +1,6 @@
 import {
+  ArrayMinSize,
+  IsArray,
   IsBoolean,
   IsEmail,
   IsNotEmpty,
@@ -9,6 +11,7 @@ import {
 import { ValidationMessages } from '../maps/validation.maps';
 
 // Access Requests
+// Permission requests
 export class CreatePermissionRequest {
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsOptional()
@@ -30,12 +33,25 @@ export class UpdatePermissionRequest {
   id: string;
 
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
-  @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
+  @IsOptional()
   name: string;
 
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsOptional()
   description: string;
+}
+
+// Role requests
+export class AssignPermissionsToRoleRequest {
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
+  id: string;
+
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
+  @ArrayMinSize(1)
+  @IsArray()
+  permissions: string[];
 }
 
 export class CreateRoleRequest {

@@ -7,6 +7,7 @@ import {
   CreatePermissionRequest,
   DeletePermissionRequest,
   UpdatePermissionRequest,
+  AssignPermissionsToRoleRequest,
 } from 'src/custom/requests/user.request';
 import { UserService } from 'src/user/user.service';
 
@@ -33,6 +34,11 @@ export class AccessController {
   @GrpcMethod('UserGrpcService', 'GetRoles')
   getRoles() {
     return this.userService.getRoles();
+  }
+
+  @GrpcMethod('UserGrpcService', 'AssignPermissionsToRole')
+  assignPermissionToRole(request: AssignPermissionsToRoleRequest) {
+    return this.userService.assignPermissionToRole(request);
   }
 
   // Permission routes

@@ -15,6 +15,17 @@ service UserGrpcService {
   rpc UpdatePermission (UpdatePermissionRequest) returns (UpdatePermissionReturn) {}
   rpc DeletePermission (DeletePermissionRequest) returns (DeletePermissionReturn) {}
   rpc GetPermissions (GetPermissionsRequest) returns (GetPermissionsReturn) {}
+  rpc AssignPermissionsToRole (AssignPermissionsToRoleRequest) returns (AssignPermissionsToRoleReturn) {}
+}
+
+// Assign permission to role
+message AssignPermissionsToRoleRequest{
+  string id = 1;
+  repeated string permissions = 2;
+}
+
+message AssignPermissionsToRoleReturn {
+  string message = 1;
 }
 
 // Get permissions

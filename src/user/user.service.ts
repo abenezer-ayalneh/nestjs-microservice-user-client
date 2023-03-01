@@ -9,6 +9,7 @@ import { Permission } from 'src/custom/models/permission.model';
 import { Role } from 'src/custom/models/role.model';
 import { User } from 'src/custom/models/user.model';
 import {
+  AssignPermissionsToRoleRequest,
   CheckUserRequest,
   CreatePermissionRequest,
   CreateRoleRequest,
@@ -41,6 +42,45 @@ export class UserService {
   }
 
   // Access service methods
+  // Role methods
+  async assignPermissionToRole(request: AssignPermissionsToRoleRequest) {
+    // TODO Assign provided permissions for the requested role
+    try {
+      const roleFromDb = await this.db.execute({
+        query: select().from('roles').where({ id: request.id }),
+        schema: Role,
+      });
+
+      if (roleFromDb.length === 0) {
+        throw new RpcException({
+          message: ValidationMessages.ROLE_NOT_FOUND,
+          code: GrpcStatus.UNKNOWN,
+        });
+      } else {
+        await this.db.execute({
+          query: update('roles')
+            .where({ id: request.id })
+            .set('permissions', request.permissions),
+          schema: Role,
+        });
+
+        return {
+          message: SuccessMessages.PERMISSION_ASSIGNED_SUCCESSFULLY,
+        };
+      }
+    } catch (error) {
+      console.error(error);
+      if (error instanceof RpcException) {
+        throw error;
+      } else {
+        throw new RpcException({
+          message: error.message ?? ValidationMessages.SOMETHING_WENT_WRONG,
+          code: GrpcStatus.INTERNAL,
+        });
+      }
+    }
+  }
+
   async getPermissions() {
     // TODO Fetch all permissions here
     try {
@@ -112,6 +152,7 @@ export class UserService {
       if (permissionFromDb.length === 0) {
         await this.db.execute({
           query: create('permissions').setAll({
+            id: request.name,
             ...request,
             created_at: eq(time.now()),
           }),
@@ -252,6 +293,7 @@ export class UserService {
       if (roleFromDb.length === 0) {
         await this.db.execute({
           query: create('roles').setAll({
+            id: request.name,
             ...request,
             created_at: eq(time.now()),
           }),
