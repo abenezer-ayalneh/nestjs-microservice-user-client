@@ -9,4 +9,6 @@ export const ValidationMessages = {
   TARGET_SHOULD_BE_BOOLEAN: 'validation.$property_SHOULD_BE_BOOLEAN',
   ROLE_EXISTS: 'validation.ROLE_EXISTS',
   ROLE_NOT_FOUND: 'validation.ROLE_NOT_FOUND',
+  PERMISSION_EXISTS: 'validation.PERMISSION_EXISTS',
+  PERMISSION_NOT_FOUND: 'validation.PERMISSION_NOT_FOUND',
 };

@@ -10,6 +10,69 @@ service UserGrpcService {
   rpc CreateRole (CreateRoleRequest) returns (CreateRoleReturn) {}
   rpc UpdateRole (UpdateRoleRequest) returns (UpdateRoleReturn) {}
   rpc DeleteRole (DeleteRoleRequest) returns (DeleteRoleReturn) {}
+  rpc GetRoles (GetRolesRequest) returns (GetRolesReturn) {}
+  rpc CreatePermission (CreatePermissionRequest) returns (CreatePermissionReturn) {}
+  rpc UpdatePermission (UpdatePermissionRequest) returns (UpdatePermissionReturn) {}
+  rpc DeletePermission (DeletePermissionRequest) returns (DeletePermissionReturn) {}
+  rpc GetPermissions (GetPermissionsRequest) returns (GetPermissionsReturn) {}
+}
+
+// Get permissions
+message GetPermissionsRequest {
+}
+
+message GetPermissionsReturn {
+  repeated PermissionMap permissions = 1;
+}
+
+message PermissionMap {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+}
+
+// Delete permission
+message DeletePermissionRequest {
+  string id = 1;
+}
+
+message DeletePermissionReturn {
+  string message = 1;
+}
+
+// Update permission
+message UpdatePermissionRequest {
+  string id = 1;
+  optional string name = 2;
+  optional string description = 3;
+}
+
+message UpdatePermissionReturn {
+  string message = 1;
+}
+
+// Create permission
+message CreatePermissionRequest {
+  string name = 1;
+  optional string description = 2;
+}
+
+message CreatePermissionReturn {
+  string message = 1;
+}
+
+// Get roles
+message GetRolesRequest {
+}
+
+message GetRolesReturn {
+  repeated RoleMap roles = 1;
+}
+
+message RoleMap {
+  string id = 1;
+  string name = 2;
+  string description = 3;
 }
 
 // Delete role

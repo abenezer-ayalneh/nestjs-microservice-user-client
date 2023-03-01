@@ -9,6 +9,35 @@ import {
 import { ValidationMessages } from '../maps/validation.maps';
 
 // Access Requests
+export class CreatePermissionRequest {
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsOptional()
+  name: string;
+
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsOptional()
+  description: string;
+}
+
+export class DeletePermissionRequest {
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
+  id: string;
+}
+export class UpdatePermissionRequest {
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
+  id: string;
+
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
+  name: string;
+
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsOptional()
+  description: string;
+}
+
 export class CreateRoleRequest {
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsOptional()

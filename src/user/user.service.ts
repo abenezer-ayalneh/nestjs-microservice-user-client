@@ -2,17 +2,20 @@ import { status as GrpcStatus } from '@grpc/grpc-js';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
-import { Cirql, create, del, delRecord, eq, select, update } from 'cirql';
-import { time } from 'cirql';
+import { Cirql, create, delRecord, eq, select, time, update } from 'cirql';
 import { SuccessMessages } from 'src/custom/maps/success.maps';
 import { ValidationMessages } from 'src/custom/maps/validation.maps';
+import { Permission } from 'src/custom/models/permission.model';
 import { Role } from 'src/custom/models/role.model';
 import { User } from 'src/custom/models/user.model';
 import {
   CheckUserRequest,
+  CreatePermissionRequest,
   CreateRoleRequest,
+  DeletePermissionRequest,
   DeleteRoleRequest,
   DeleteUserRequest,
+  UpdatePermissionRequest,
   UpdateUserRequest,
 } from 'src/custom/requests/user.request';
 import {
@@ -38,8 +41,173 @@ export class UserService {
   }
 
   // Access service methods
+  async getPermissions() {
+    // TODO Fetch all permissions here
+    try {
+      const permissions = await this.db.execute({
+        query: select().from('permissions'),
+        schema: Permission,
+      });
+
+      console.log(permissions);
+
+      return {
+        permissions,
+      };
+    } catch (error) {
+      console.error(error);
+      if (error instanceof RpcException) {
+        throw error;
+      } else {
+        throw new RpcException({
+          message: error.message ?? ValidationMessages.SOMETHING_WENT_WRONG,
+          code: GrpcStatus.INTERNAL,
+        });
+      }
+    }
+  }
+
+  async deletePermission(request: DeletePermissionRequest) {
+    try {
+      const permissionFromDb = await this.db.execute({
+        query: select().from('permissions').where({ id: request.id }),
+        schema: Permission,
+      });
+
+      if (permissionFromDb.length === 0) {
+        throw new RpcException({
+          message: ValidationMessages.PERMISSION_NOT_FOUND,
+          code: GrpcStatus.UNKNOWN,
+        });
+      } else {
+        await this.db.execute({
+          query: delRecord(request.id),
+          schema: Permission,
+        });
+
+        return {
+          message: SuccessMessages.PERMISSION_CREATED_SUCCESSFULLY,
+        };
+      }
+    } catch (error) {
+      console.error(error);
+      if (error instanceof RpcException) {
+        throw error;
+      } else {
+        throw new RpcException({
+          message: error.message ?? ValidationMessages.SOMETHING_WENT_WRONG,
+          code: GrpcStatus.INTERNAL,
+        });
+      }
+    }
+  }
+
+  async createPermission(request: CreatePermissionRequest) {
+    try {
+      const permissionFromDb = await this.db.execute({
+        query: select().from('permissions').where({ name: request.name }),
+        schema: Permission,
+      });
+
+      if (permissionFromDb.length === 0) {
+        await this.db.execute({
+          query: create('permissions').setAll({
+            ...request,
+            created_at: eq(time.now()),
+          }),
+          schema: Permission,
+        });
+
+        return {
+          message: SuccessMessages.PERMISSION_CREATED_SUCCESSFULLY,
+        };
+      } else {
+        throw new RpcException({
+          message: ValidationMessages.PERMISSION_EXISTS,
+          code: GrpcStatus.UNKNOWN,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      if (error instanceof RpcException) {
+        throw error;
+      } else {
+        throw new RpcException({
+          message: error.message ?? ValidationMessages.SOMETHING_WENT_WRONG,
+          code: GrpcStatus.INTERNAL,
+        });
+      }
+    }
+  }
+
+  async updatePermission(request: UpdatePermissionRequest) {
+    try {
+      const permissionFromDb = await this.db.execute({
+        query: select().from('permissions').where({ id: request.id }),
+        schema: Permission,
+      });
+
+      if (permissionFromDb.length === 0) {
+        throw new RpcException({
+          message: ValidationMessages.PERMISSION_NOT_FOUND,
+          code: GrpcStatus.UNKNOWN,
+        });
+      } else {
+        const { id, ...requestWithoutId } = request;
+        await this.db.execute({
+          query: update('permissions')
+            .where({ id: id })
+            .setAll({
+              ...requestWithoutId,
+              updated_at: eq(time.now()),
+            }),
+          schema: Permission,
+        });
+
+        return {
+          message: SuccessMessages.PERMISSION_CREATED_SUCCESSFULLY,
+        };
+      }
+    } catch (error) {
+      console.error(error);
+      if (error instanceof RpcException) {
+        throw error;
+      } else {
+        throw new RpcException({
+          message: error.message ?? ValidationMessages.SOMETHING_WENT_WRONG,
+          code: GrpcStatus.INTERNAL,
+        });
+      }
+    }
+  }
+
+  async getRoles() {
+    // TODO Fetch all roles here
+    try {
+      const roles = await this.db.execute({
+        query: select().from('roles'),
+        schema: Role,
+      });
+
+      console.log(roles);
+
+      return {
+        roles,
+      };
+    } catch (error) {
+      console.error(error);
+      if (error instanceof RpcException) {
+        throw error;
+      } else {
+        throw new RpcException({
+          message: error.message ?? ValidationMessages.SOMETHING_WENT_WRONG,
+          code: GrpcStatus.INTERNAL,
+        });
+      }
+    }
+  }
+
   async deleteRole(request: DeleteRoleRequest) {
-    // TODO Delete the role here
     try {
       const roleFromDb = await this.db.execute({
         query: select().from('roles').where({ id: request.id }),
@@ -48,7 +216,7 @@ export class UserService {
 
       if (roleFromDb.length === 0) {
         throw new RpcException({
-          message: ValidationMessages.ROLE_EXISTS,
+          message: ValidationMessages.ROLE_NOT_FOUND,
           code: GrpcStatus.UNKNOWN,
         });
       } else {
@@ -75,7 +243,6 @@ export class UserService {
   }
 
   async createRole(request: CreateRoleRequest) {
-    // TODO Update the role here
     try {
       const roleFromDb = await this.db.execute({
         query: select().from('roles').where({ name: request.name }),
@@ -114,7 +281,6 @@ export class UserService {
   }
 
   async updateRole(request: UpdateRoleRequest) {
-    // TODO Create the role here
     try {
       const roleFromDb = await this.db.execute({
         query: select().from('roles').where({ id: request.id }),
