@@ -7,7 +7,7 @@ export const ValidationMessages = {
   TARGET_SHOULD_BE_STRING: 'validation.$property_SHOULD_BE_STRING',
   TARGET_SHOULD_BE_NUMBER: 'validation.$property_SHOULD_BE_NUMBER',
   TARGET_SHOULD_BE_BOOLEAN: 'validation.$property_SHOULD_BE_BOOLEAN',
-  TARGET_SHOULD_BE_ARRAY: 'validation.TARGET_SHOULD_BE_ARRAY',
+  TARGET_SHOULD_BE_ARRAY: 'validation.$property_SHOULD_BE_ARRAY',
   ROLE_EXISTS: 'validation.ROLE_EXISTS',
   ROLE_NOT_FOUND: 'validation.ROLE_NOT_FOUND',
   PERMISSION_EXISTS: 'validation.PERMISSION_EXISTS',

@@ -10,6 +10,12 @@ import {
   UpdatePermissionRequest,
   UpdateRoleRequest,
   UserHasPermissionsRequest,
+  GetUserRolesRequest,
+  GetUserPermissionsRequest,
+  RevokeRolesFromUserRequest,
+  RevokePermissionsFromUserRequest,
+  GetUsersViaRolesRequest,
+  GetUsersViaPermissionsRequest,
 } from 'src/custom/requests/user.request';
 import { AccessService } from './access.service';
 
@@ -48,6 +54,11 @@ export class AccessController {
     return this.accessService.assignRolesToUser(request);
   }
 
+  @GrpcMethod('UserGrpcService', 'RevokeRolesFromUser')
+  revokeRolesFromUser(request: RevokeRolesFromUserRequest) {
+    return this.accessService.revokeRolesFromUser(request);
+  }
+
   // Permission routes
   @GrpcMethod('UserGrpcService', 'CreatePermission')
   createPermission(request: CreatePermissionRequest) {
@@ -77,5 +88,30 @@ export class AccessController {
   @GrpcMethod('UserGrpcService', 'UserHasPermissions')
   userHasPermissions(request: UserHasPermissionsRequest) {
     return this.accessService.userHasPermissions(request);
+  }
+
+  @GrpcMethod('UserGrpcService', 'GetUserRoles')
+  getUserRoles(request: GetUserRolesRequest) {
+    return this.accessService.getUserRoles(request);
+  }
+
+  @GrpcMethod('UserGrpcService', 'GetUserPermissions')
+  getUserPermissions(request: GetUserPermissionsRequest) {
+    return this.accessService.getUserPermissions(request);
+  }
+
+  @GrpcMethod('UserGrpcService', 'RevokePermissionsFromUser')
+  revokePermissionsFromUser(request: RevokePermissionsFromUserRequest) {
+    return this.accessService.revokePermissionsFromUser(request);
+  }
+
+  @GrpcMethod('UserGrpcService', 'GetUsersViaRoles')
+  getUsersViaRoles(request: GetUsersViaRolesRequest) {
+    return this.accessService.getUsersViaRoles(request);
+  }
+
+  @GrpcMethod('UserGrpcService', 'GetUsersViaPermissions')
+  getUsersViaPermissions(request: GetUsersViaPermissionsRequest) {
+    return this.accessService.getUsersViaPermissions(request);
   }
 }

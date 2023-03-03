@@ -17,6 +17,7 @@ async function bootstrap() {
         package: 'user',
         protoPath: join(__dirname, 'custom/proto/user.proto'),
         url: '0.0.0.0:5002',
+        loader: { keepCase: true },
       },
     },
   );

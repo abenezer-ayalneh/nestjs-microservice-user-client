@@ -1,0 +1,44 @@
+[
+  {
+    "_id": "c8b68c3d-de9c-488f-a59d-da1c67c2211c",
+    "colName": "Role",
+    "created": "2023-03-03T10:35:36.011Z",
+    "sortNum": 65000,
+    "folders": []
+  },
+  {
+    "_id": "d38a78f6-52a7-4dc6-aa66-d438d69a51ba",
+    "colName": "Auth",
+    "created": "2023-03-03T10:36:43.421Z",
+    "sortNum": 20000,
+    "folders": []
+  },
+  {
+    "_id": "43a7bc92-f8b1-4b75-b04c-fd9a26ef27fe",
+    "colName": "Mail",
+    "created": "2023-03-03T10:36:43.455Z",
+    "sortNum": 30000,
+    "folders": []
+  },
+  {
+    "_id": "5abfeb3c-d0de-45a9-bd5f-1913dd56d863",
+    "colName": "Permission",
+    "created": "2023-03-03T10:36:43.462Z",
+    "sortNum": 70000,
+    "folders": []
+  },
+  {
+    "_id": "8cdb359f-051c-4c1a-9950-5e8858f005e8",
+    "colName": "Search",
+    "created": "2023-03-03T10:36:43.467Z",
+    "sortNum": 25000,
+    "folders": []
+  },
+  {
+    "_id": "f211616c-6ac6-4378-9c0a-8621ac882ae1",
+    "colName": "User",
+    "created": "2023-03-03T10:36:43.477Z",
+    "sortNum": 60000,
+    "folders": []
+  }
+]

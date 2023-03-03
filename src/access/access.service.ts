@@ -19,6 +19,12 @@ import {
   DeleteRoleRequest,
   UpdatePermissionRequest,
   UserHasPermissionsRequest,
+  GetUserRolesRequest,
+  GetUserPermissionsRequest,
+  RevokeRolesFromUserRequest,
+  RevokePermissionsFromUserRequest,
+  GetUsersViaRolesRequest,
+  GetUsersViaPermissionsRequest,
 } from 'src/custom/requests/user.request';
 import { UpdateRoleRequest } from '../custom/requests/user.request';
 
@@ -40,6 +46,94 @@ export class AccessService {
   }
 
   // Role methods
+  async getUsersViaRoles(request: GetUsersViaRolesRequest) {
+    // TODO Fetch all roles here
+    try {
+      const users = await this.db.execute({
+        query: select().from('users').where('roles CONTAINSALL $roles'),
+        schema: User,
+        params: {
+          roles: request.roles,
+        },
+      });
+
+      return {
+        users,
+      };
+    } catch (error) {
+      console.error(error);
+      if (error instanceof RpcException) {
+        throw error;
+      } else {
+        throw new RpcException({
+          message: error.message ?? ValidationMessages.SOMETHING_WENT_WRONG,
+          code: GrpcStatus.INTERNAL,
+        });
+      }
+    }
+  }
+
+  async revokeRolesFromUser(request: RevokeRolesFromUserRequest) {
+    // TODO Revoke roles from user here
+    try {
+      const userFromDb = await this.db.execute({
+        query: select().from('users').where({ id: request.id }),
+        schema: User,
+      });
+
+      const rolesFromDb = await this.db.execute({
+        query: select().from('roles').where('id INSIDE $roles'),
+        params: {
+          roles: request.roles,
+        },
+        schema: Role,
+      });
+
+      if (rolesFromDb.length !== [...new Set(request.roles)].length) {
+        throw new RpcException({
+          message: ValidationMessages.ROLE_NOT_FOUND,
+          code: GrpcStatus.UNKNOWN,
+        });
+      } else if (userFromDb.length === 0) {
+        throw new RpcException({
+          message: ValidationMessages.USER_DOES_NOT_EXISTS,
+          code: GrpcStatus.UNKNOWN,
+        });
+      } else {
+        console.log(
+          (userFromDb[0].roles ?? []).filter(
+            (requestRole) => !request.roles.includes(requestRole),
+          ),
+        );
+        await this.db.execute({
+          query: update('users')
+            .where({ id: request.id })
+            .set(
+              'roles',
+              (userFromDb[0].roles ?? []).filter(
+                (requestRole) => !request.roles.includes(requestRole),
+              ),
+            ),
+          schema: User,
+        });
+
+        return {
+          message: SuccessMessages.ROLE_REVOKED_SUCCESSFULLY,
+        };
+      }
+    } catch (error) {
+      console.error(error);
+      if (error instanceof RpcException) {
+        throw error;
+      } else {
+        throw new RpcException({
+          message: error.message ?? ValidationMessages.SOMETHING_WENT_WRONG,
+          code: GrpcStatus.INTERNAL,
+        });
+      }
+    }
+  }
+
   async assignRolesToUser(request: AssignRolesToUserRequest) {
     // TODO Assign roles to user here
     try {
@@ -67,10 +161,17 @@ export class AccessService {
           code: GrpcStatus.UNKNOWN,
         });
       } else {
+        // console.log({
+        //   requestRoles: request.roles,
+        //   dbRoles: userFromDb[0].roles,
+        //   merged: [...new Set(request.roles.concat(userFromDb[0].roles ?? []))],
+        // });
         await this.db.execute({
           query: update('users')
             .where({ id: request.id })
-            .set('roles', request.roles),
+            .set('roles', [
+              ...new Set(request.roles.concat(userFromDb[0].roles ?? [])),
+            ]), // Concat the new roles with the ones the user already have
           schema: User,
         });
 
@@ -127,7 +228,11 @@ export class AccessService {
         await this.db.execute({
           query: update('roles')
             .where({ id: request.id })
-            .set('permissions', request.permissions),
+            .set('permissions', [
+              ...new Set(
+                request.permissions.concat(roleFromDb[0].permissions ?? []),
+              ),
+            ]),
           schema: Role,
         });
 
@@ -287,7 +392,132 @@ export class AccessService {
     }
   }
 
+  async getUserRoles(request: GetUserRolesRequest) {
+    // TODO get the user roles here
+    try {
+      const user = await this.db.execute({
+        query: select().from('users').where({ id: request.id }),
+        schema: User,
+      });
+
+      const roles = await this.db.execute({
+        query: select().from('roles').where('id INSIDE $roleIds'),
+        params: {
+          roleIds: user[0].roles,
+        },
+        schema: Role,
+      });
+
+      return {
+        roles: roles,
+      };
+    } catch (error) {
+      console.error(error);
+      if (error instanceof RpcException) {
+        throw error;
+      } else {
+        throw new RpcException({
+          message: error.message ?? ValidationMessages.SOMETHING_WENT_WRONG,
+          code: GrpcStatus.INTERNAL,
+        });
+      }
+    }
+  }
+
   // Permission methods
+  async getUsersViaPermissions(request: GetUsersViaPermissionsRequest) {
+    // TODO Fetch all permissions here
+    try {
+      const users = await this.db.execute({
+        query: select()
+          .from('users')
+          .where('permissions CONTAINSALL $permissions'),
+        schema: User,
+        params: {
+          permissions: request.permissions,
+        },
+      });
+
+      return {
+        users,
+      };
+    } catch (error) {
+      console.error(error);
+      if (error instanceof RpcException) {
+        throw error;
+      } else {
+        throw new RpcException({
+          message: error.message ?? ValidationMessages.SOMETHING_WENT_WRONG,
+          code: GrpcStatus.INTERNAL,
+        });
+      }
+    }
+  }
+
+  async revokePermissionsFromUser(request: RevokePermissionsFromUserRequest) {
+    // TODO Revoke permissions from user here
+    try {
+      const userFromDb = await this.db.execute({
+        query: select().from('users').where({ id: request.id }),
+        schema: User,
+      });
+
+      const permissionsFromDb = await this.db.execute({
+        query: select().from('permissions').where('id INSIDE $permissions'),
+        params: {
+          permissions: request.permissions,
+        },
+        schema: Permission,
+      });
+
+      if (
+        permissionsFromDb.length !== [...new Set(request.permissions)].length
+      ) {
+        throw new RpcException({
+          message: ValidationMessages.PERMISSION_NOT_FOUND,
+          code: GrpcStatus.UNKNOWN,
+        });
+      } else if (userFromDb.length === 0) {
+        throw new RpcException({
+          message: ValidationMessages.USER_DOES_NOT_EXISTS,
+          code: GrpcStatus.UNKNOWN,
+        });
+      } else {
+        console.log(
+          (userFromDb[0].permissions ?? []).filter(
+            (requestPermission) =>
+              !request.permissions.includes(requestPermission),
+          ),
+        );
+        await this.db.execute({
+          query: update('users')
+            .where({ id: request.id })
+            .set(
+              'permissions',
+              userFromDb[0].permissions.filter(
+                (dbPermission) => !request.permissions.includes(dbPermission),
+              ),
+            ),
+          schema: User,
+        });
+
+        return {
+          message: SuccessMessages.PERMISSION_REVOKED_SUCCESSFULLY,
+        };
+      }
+    } catch (error) {
+      console.error(error);
+      if (error instanceof RpcException) {
+        throw error;
+      } else {
+        throw new RpcException({
+          message: error.message ?? ValidationMessages.SOMETHING_WENT_WRONG,
+          code: GrpcStatus.INTERNAL,
+        });
+      }
+    }
+  }
+
   async userHasPermissions(request: UserHasPermissionsRequest) {
     // TODO Check if the user has permissions
     try {
@@ -377,7 +607,11 @@ export class AccessService {
         await this.db.execute({
           query: update('users')
             .where({ id: request.id })
-            .set('permissions', request.permissions),
+            .set('permissions', [
+              ...new Set(
+                request.permissions.concat(userFromDb[0].permissions ?? []),
+              ),
+            ]),
           schema: User,
         });
 
@@ -524,6 +758,50 @@ export class AccessService {
           message: SuccessMessages.PERMISSION_CREATED_SUCCESSFULLY,
         };
       }
+    } catch (error) {
+      console.error(error);
+      if (error instanceof RpcException) {
+        throw error;
+      } else {
+        throw new RpcException({
+          message: error.message ?? ValidationMessages.SOMETHING_WENT_WRONG,
+          code: GrpcStatus.INTERNAL,
+        });
+      }
+    }
+  }
+
+  async getUserPermissions(request: GetUserPermissionsRequest) {
+    // TODO get the user permissions here
+    try {
+      const userPermissions = await this.db.execute({
+        query: select('roles.permissions', 'permissions')
+          .from('users')
+          .where({ id: request.id }),
+        schema: z.any(),
+      });
+
+      const mergedPermissions = userPermissions[0]['permissions'].concat(
+        userPermissions[0]['roles']['permissions'].flatMap(
+          (permission) => permission,
+        ),
+      );
+
+      const uniqueMergedPermissions = [...new Set(mergedPermissions)];
+
+      const permissions = await this.db.execute({
+        query: select().from('permissions').where('id INSIDE $permissionIds'),
+        params: {
+          permissionIds: uniqueMergedPermissions,
+        },
+        schema: Permission,
+      });
+
+      console.log(permissions);
+
+      return {
+        permissions: permissions,
+      };
     } catch (error) {
       console.error(error);
       if (error instanceof RpcException) {

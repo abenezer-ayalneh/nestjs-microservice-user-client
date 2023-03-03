@@ -12,6 +12,42 @@ import { ValidationMessages } from '../maps/validation.maps';
 
 // Access Requests
 // Permission requests
+export class GetUsersViaPermissionsRequest {
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
+  @ArrayMinSize(1, {
+    message: ValidationMessages.TARGET_MIN_SIZE_SHOULD_BE_THIS,
+  })
+  @IsArray({ message: ValidationMessages.TARGET_SHOULD_BE_ARRAY })
+  permissions: string[];
+}
+
+export class RevokePermissionsFromUserRequest {
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
+  id: string;
+
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
+  @ArrayMinSize(1, {
+    message: ValidationMessages.TARGET_MIN_SIZE_SHOULD_BE_THIS,
+  })
+  @IsArray({ message: ValidationMessages.TARGET_SHOULD_BE_ARRAY })
+  permissions: string[];
+}
+
+export class GetUserPermissionsRequest {
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
+  id: string;
+}
+
+export class GetUserRolesRequest {
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
+  id: string;
+}
+
 export class UserHasPermissionsRequest {
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
@@ -70,7 +106,17 @@ export class UpdatePermissionRequest {
 }
 
 // Role requests
-export class AssignRolesToUserRequest {
+export class GetUsersViaRolesRequest {
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
+  @ArrayMinSize(1, {
+    message: ValidationMessages.TARGET_MIN_SIZE_SHOULD_BE_THIS,
+  })
+  @IsArray({ message: ValidationMessages.TARGET_SHOULD_BE_ARRAY })
+  roles: string[];
+}
+
+export class RevokeRolesFromUserRequest {
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
   id: string;
@@ -82,6 +128,20 @@ export class AssignRolesToUserRequest {
   })
   @IsArray({ message: ValidationMessages.TARGET_SHOULD_BE_ARRAY })
   roles: string[];
+}
+
+export class AssignRolesToUserRequest {
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
+  id: string;
+
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
+  @ArrayMinSize(1, {
+    message: ValidationMessages.TARGET_MIN_SIZE_SHOULD_BE_THIS,
+  })
+  @IsArray({ message: ValidationMessages.TARGET_SHOULD_BE_ARRAY })
+  roles: string[] = [];
 }
 
 export class AssignPermissionsToRoleRequest {
