@@ -16,6 +16,39 @@ service UserGrpcService {
   rpc DeletePermission (DeletePermissionRequest) returns (DeletePermissionReturn) {}
   rpc GetPermissions (GetPermissionsRequest) returns (GetPermissionsReturn) {}
   rpc AssignPermissionsToRole (AssignPermissionsToRoleRequest) returns (AssignPermissionsToRoleReturn) {}
+  rpc AssignRolesToUser (AssignRolesToUserRequest) returns (AssignRolesToUserReturn) {}
+  rpc AssignPermissionsToUser (AssignPermissionsToUserRequest) returns (AssignPermissionsToUserReturn) {}
+  rpc UserHasPermissions (UserHasPermissionsRequest) returns (UserHasPermissionsReturn) {}
+}
+
+// Check if the user has permissions
+message UserHasPermissionsRequest{
+  string id = 1;
+  repeated string permissions = 2;
+}
+
+message UserHasPermissionsReturn {
+  string message = 1;
+}
+
+// Assign permission to user
+message AssignPermissionsToUserRequest{
+  string id = 1;
+  repeated string permissions = 2;
+}
+
+message AssignPermissionsToUserReturn {
+  string message = 1;
+}
+
+// Assign roles to user
+message AssignRolesToUserRequest{
+  string id = 1;
+  repeated string roles = 2;
+}
+
+message AssignRolesToUserReturn {
+  string message = 1;
 }
 
 // Assign permission to role

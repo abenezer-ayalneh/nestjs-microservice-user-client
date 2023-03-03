@@ -1,64 +1,81 @@
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import {
-  CreateRoleRequest,
-  DeleteRoleRequest,
-  UpdateRoleRequest,
-  CreatePermissionRequest,
-  DeletePermissionRequest,
-  UpdatePermissionRequest,
   AssignPermissionsToRoleRequest,
+  AssignRolesToUserRequest,
+  CreatePermissionRequest,
+  CreateRoleRequest,
+  DeletePermissionRequest,
+  DeleteRoleRequest,
+  UpdatePermissionRequest,
+  UpdateRoleRequest,
+  UserHasPermissionsRequest,
 } from 'src/custom/requests/user.request';
-import { UserService } from 'src/user/user.service';
+import { AccessService } from './access.service';
 
 @Controller()
 export class AccessController {
-  constructor(private userService: UserService) {}
+  constructor(private accessService: AccessService) {}
 
   // Role routes
   @GrpcMethod('UserGrpcService', 'CreateRole')
   createRole(request: CreateRoleRequest) {
-    return this.userService.createRole(request);
+    return this.accessService.createRole(request);
   }
 
   @GrpcMethod('UserGrpcService', 'UpdateRole')
   updateRole(request: UpdateRoleRequest) {
-    return this.userService.updateRole(request);
+    return this.accessService.updateRole(request);
   }
 
   @GrpcMethod('UserGrpcService', 'DeleteRole')
   deleteRole(request: DeleteRoleRequest) {
-    return this.userService.deleteRole(request);
+    return this.accessService.deleteRole(request);
   }
 
   @GrpcMethod('UserGrpcService', 'GetRoles')
   getRoles() {
-    return this.userService.getRoles();
+    return this.accessService.getRoles();
   }
 
   @GrpcMethod('UserGrpcService', 'AssignPermissionsToRole')
-  assignPermissionToRole(request: AssignPermissionsToRoleRequest) {
-    return this.userService.assignPermissionToRole(request);
+  assignPermissionsToRole(request: AssignPermissionsToRoleRequest) {
+    return this.accessService.assignPermissionToRole(request);
+  }
+
+  @GrpcMethod('UserGrpcService', 'AssignRolesToUser')
+  assignRolesToUser(request: AssignRolesToUserRequest) {
+    return this.accessService.assignRolesToUser(request);
   }
 
   // Permission routes
   @GrpcMethod('UserGrpcService', 'CreatePermission')
   createPermission(request: CreatePermissionRequest) {
-    return this.userService.createPermission(request);
+    return this.accessService.createPermission(request);
   }
 
   @GrpcMethod('UserGrpcService', 'UpdatePermission')
   updatePermission(request: UpdatePermissionRequest) {
-    return this.userService.updatePermission(request);
+    return this.accessService.updatePermission(request);
   }
 
   @GrpcMethod('UserGrpcService', 'DeletePermission')
   deletePermission(request: DeletePermissionRequest) {
-    return this.userService.deletePermission(request);
+    return this.accessService.deletePermission(request);
   }
 
   @GrpcMethod('UserGrpcService', 'GetPermissions')
   getPermissions() {
-    return this.userService.getPermissions();
+    return this.accessService.getPermissions();
+  }
+
+  @GrpcMethod('UserGrpcService', 'AssignPermissionsToUser')
+  assignPermissionsToUser(request: AssignPermissionsToRoleRequest) {
+    return this.accessService.assignPermissionsToUser(request);
+  }
+
+  @GrpcMethod('UserGrpcService', 'UserHasPermissions')
+  userHasPermissions(request: UserHasPermissionsRequest) {
+    return this.accessService.userHasPermissions(request);
   }
 }

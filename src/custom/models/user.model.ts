@@ -25,4 +25,6 @@ export const User = RecordSchema.extend({
   active_status: z.number().nullable().default(0),
   dark_mode: z.number().nullable().default(0),
   messenger_color: z.string().nullable().default('#2180F3'),
+  roles: z.string().array().nullable(),
+  permissions: z.string().array().nullable(),
 });

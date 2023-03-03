@@ -12,6 +12,34 @@ import { ValidationMessages } from '../maps/validation.maps';
 
 // Access Requests
 // Permission requests
+export class UserHasPermissionsRequest {
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
+  id: string;
+
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
+  @ArrayMinSize(1, {
+    message: ValidationMessages.TARGET_MIN_SIZE_SHOULD_BE_THIS,
+  })
+  @IsArray({ message: ValidationMessages.TARGET_SHOULD_BE_ARRAY })
+  permissions: string[];
+}
+
+export class AssignPermissionsToUserRequest {
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
+  id: string;
+
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
+  @ArrayMinSize(1, {
+    message: ValidationMessages.TARGET_MIN_SIZE_SHOULD_BE_THIS,
+  })
+  @IsArray({ message: ValidationMessages.TARGET_SHOULD_BE_ARRAY })
+  permissions: string[];
+}
+
 export class CreatePermissionRequest {
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsOptional()
@@ -42,6 +70,20 @@ export class UpdatePermissionRequest {
 }
 
 // Role requests
+export class AssignRolesToUserRequest {
+  @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
+  @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
+  id: string;
+
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
+  @ArrayMinSize(1, {
+    message: ValidationMessages.TARGET_MIN_SIZE_SHOULD_BE_THIS,
+  })
+  @IsArray({ message: ValidationMessages.TARGET_SHOULD_BE_ARRAY })
+  roles: string[];
+}
+
 export class AssignPermissionsToRoleRequest {
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
@@ -49,8 +91,10 @@ export class AssignPermissionsToRoleRequest {
 
   @IsString({ each: true })
   @IsNotEmpty({ each: true })
-  @ArrayMinSize(1)
-  @IsArray()
+  @ArrayMinSize(1, {
+    message: ValidationMessages.TARGET_MIN_SIZE_SHOULD_BE_THIS,
+  })
+  @IsArray({ message: ValidationMessages.TARGET_SHOULD_BE_ARRAY })
   permissions: string[];
 }
 
@@ -93,7 +137,7 @@ export class CheckUserRequest {
 export class StoreUserRequest {
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsOptional()
-  name: string = null;
+  name: string;
 
   @IsEmail({}, { message: ValidationMessages.TARGET_SHOULD_BE_VALID })
   @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
@@ -101,19 +145,19 @@ export class StoreUserRequest {
 
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsOptional()
-  password: string = null;
+  password: string;
 
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsOptional()
-  email_verified_at: string = null;
+  email_verified_at: string;
 
   @IsNumber({}, { message: ValidationMessages.TARGET_SHOULD_BE_NUMBER })
   @IsOptional()
-  plan: number = null;
+  plan = 0;
 
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsOptional()
-  plan_expire_date: string = null;
+  plan_expire_date: string;
 
   @IsNumber({}, { message: ValidationMessages.TARGET_SHOULD_BE_NUMBER })
   @IsOptional()
@@ -121,15 +165,15 @@ export class StoreUserRequest {
 
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsOptional()
-  type: string = null;
+  type: string;
 
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsOptional()
-  avatar: string = null;
+  avatar: string;
 
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsOptional()
-  lang: string = null;
+  lang: string;
 
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsOptional()
@@ -141,7 +185,7 @@ export class StoreUserRequest {
 
   @IsNumber({}, { message: ValidationMessages.TARGET_SHOULD_BE_NUMBER })
   @IsOptional()
-  default_pipeline: number = null;
+  default_pipeline = 0;
 
   @IsNumber({}, { message: ValidationMessages.TARGET_SHOULD_BE_NUMBER })
   @IsOptional()
@@ -149,23 +193,23 @@ export class StoreUserRequest {
 
   @IsBoolean({ message: ValidationMessages.TARGET_SHOULD_BE_BOOLEAN })
   @IsOptional()
-  is_active = true;
+  is_active: boolean;
 
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsOptional()
-  remember_token: string = null;
+  remember_token: string;
 
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsOptional()
-  last_login_at: string = null;
+  last_login_at: string;
 
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsOptional()
-  created_at: string = null;
+  created_at: string;
 
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsOptional()
-  updated_at: string = null;
+  updated_at: string;
 
   @IsNumber({}, { message: ValidationMessages.TARGET_SHOULD_BE_NUMBER })
   @IsOptional()
@@ -177,7 +221,7 @@ export class StoreUserRequest {
 
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsOptional()
-  messenger_color: string = null;
+  messenger_color = '#2180F3';
 }
 
 export class UpdateUserRequest {
