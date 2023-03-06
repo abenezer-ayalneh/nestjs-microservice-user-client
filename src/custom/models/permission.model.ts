@@ -4,5 +4,5 @@ import { z } from 'zod';
 export const Permission = RecordSchema.extend({
   id: z.string(),
   name: z.string(),
-  description: z.string().nullable(),
+  description: z.optional(z.string()),
 });

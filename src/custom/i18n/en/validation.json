@@ -1,0 +1,5 @@
+{
+  "HELLO": "Hello world!",
+  "NOT_EMPTY": "{property} can not be empty",
+  "ROLE_EXISTS": "Role already exists"
+}

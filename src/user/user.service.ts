@@ -55,7 +55,7 @@ export class UserService {
 
       if (userFromDb.length === 0) {
         throw new RpcException({
-          message: ValidationMessages.USER_DOES_NOT_EXISTS,
+          message: ValidationMessages.USER_NOT_FOUND,
           code: GrpcStatus.UNKNOWN,
         });
       } else {
@@ -93,7 +93,7 @@ export class UserService {
 
       if (userFromDb.length === 0) {
         throw new RpcException({
-          message: ValidationMessages.USER_DOES_NOT_EXISTS,
+          message: ValidationMessages.USER_NOT_FOUND,
           code: GrpcStatus.UNKNOWN,
         });
       } else {
@@ -177,7 +177,7 @@ export class UserService {
         };
       } else {
         throw new RpcException({
-          message: ValidationMessages.USER_DOES_NOT_EXISTS,
+          message: ValidationMessages.USER_NOT_FOUND,
           code: GrpcStatus.INVALID_ARGUMENT,
         });
       }

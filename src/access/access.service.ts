@@ -3,12 +3,12 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
 import { Cirql, create, delRecord, eq, select, time, update } from 'cirql';
+import { I18n, I18nContext } from 'nestjs-i18n';
 import { SuccessMessages } from 'src/custom/maps/success.maps';
 import { ValidationMessages } from 'src/custom/maps/validation.maps';
 import { Permission } from 'src/custom/models/permission.model';
 import { Role } from 'src/custom/models/role.model';
 import { User } from 'src/custom/models/user.model';
-import * as z from 'zod';
 import {
   AssignPermissionsToRoleRequest,
   AssignPermissionsToUserRequest,
@@ -17,15 +17,16 @@ import {
   CreateRoleRequest,
   DeletePermissionRequest,
   DeleteRoleRequest,
+  GetUserPermissionsRequest,
+  GetUserRolesRequest,
+  GetUsersViaPermissionsRequest,
+  GetUsersViaRolesRequest,
+  RevokePermissionsFromUserRequest,
+  RevokeRolesFromUserRequest,
   UpdatePermissionRequest,
   UserHasPermissionsRequest,
-  GetUserRolesRequest,
-  GetUserPermissionsRequest,
-  RevokeRolesFromUserRequest,
-  RevokePermissionsFromUserRequest,
-  GetUsersViaRolesRequest,
-  GetUsersViaPermissionsRequest,
 } from 'src/custom/requests/user.request';
+import * as z from 'zod';
 import { UpdateRoleRequest } from '../custom/requests/user.request';
 
 @Injectable()
@@ -96,7 +97,7 @@ export class AccessService {
         });
       } else if (userFromDb.length === 0) {
         throw new RpcException({
-          message: ValidationMessages.USER_DOES_NOT_EXISTS,
+          message: ValidationMessages.USER_NOT_FOUND,
           code: GrpcStatus.UNKNOWN,
         });
       } else {
@@ -157,7 +158,7 @@ export class AccessService {
         });
       } else if (userFromDb.length === 0) {
         throw new RpcException({
-          message: ValidationMessages.USER_DOES_NOT_EXISTS,
+          message: ValidationMessages.USER_NOT_FOUND,
           code: GrpcStatus.UNKNOWN,
         });
       } else {
@@ -479,7 +480,7 @@ export class AccessService {
         });
       } else if (userFromDb.length === 0) {
         throw new RpcException({
-          message: ValidationMessages.USER_DOES_NOT_EXISTS,
+          message: ValidationMessages.USER_NOT_FOUND,
           code: GrpcStatus.UNKNOWN,
         });
       } else {
@@ -528,7 +529,7 @@ export class AccessService {
 
       if (userFromDb.length === 0) {
         throw new RpcException({
-          message: ValidationMessages.USER_DOES_NOT_EXISTS,
+          message: ValidationMessages.USER_NOT_FOUND,
           code: GrpcStatus.UNKNOWN,
         });
       } else {
@@ -600,7 +601,7 @@ export class AccessService {
         });
       } else if (userFromDb.length === 0) {
         throw new RpcException({
-          message: ValidationMessages.USER_DOES_NOT_EXISTS,
+          message: ValidationMessages.USER_NOT_FOUND,
           code: GrpcStatus.UNKNOWN,
         });
       } else {

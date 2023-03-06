@@ -8,6 +8,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
 import { ValidationMessages } from '../maps/validation.maps';
 
 // Access Requests
@@ -78,7 +79,7 @@ export class AssignPermissionsToUserRequest {
 
 export class CreatePermissionRequest {
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
-  @IsOptional()
+  @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
   name: string;
 
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
@@ -91,6 +92,7 @@ export class DeletePermissionRequest {
   @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
   id: string;
 }
+
 export class UpdatePermissionRequest {
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
@@ -160,7 +162,8 @@ export class AssignPermissionsToRoleRequest {
 
 export class CreateRoleRequest {
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
-  @IsOptional()
+  @IsNotEmpty({ message: i18nValidationMessage('validation.NOT_EMPTY') })
+  // @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
   name: string;
 
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
@@ -173,6 +176,7 @@ export class DeleteRoleRequest {
   @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
   id: string;
 }
+
 export class UpdateRoleRequest {
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsNotEmpty({ message: ValidationMessages.TARGET_SHOULD_NOT_BE_EMPTY })
@@ -251,7 +255,7 @@ export class StoreUserRequest {
   @IsOptional()
   delete_status = 1;
 
-  @IsBoolean({ message: ValidationMessages.TARGET_SHOULD_BE_BOOLEAN })
+  @IsNumber({}, { message: ValidationMessages.TARGET_SHOULD_BE_NUMBER })
   @IsOptional()
   is_active: boolean;
 
@@ -271,13 +275,13 @@ export class StoreUserRequest {
   @IsOptional()
   updated_at: string;
 
-  @IsNumber({}, { message: ValidationMessages.TARGET_SHOULD_BE_NUMBER })
+  @IsBoolean({ message: ValidationMessages.TARGET_SHOULD_BE_BOOLEAN })
   @IsOptional()
-  active_status = 0;
+  active_status = false;
 
-  @IsNumber({}, { message: ValidationMessages.TARGET_SHOULD_BE_NUMBER })
+  @IsBoolean({ message: ValidationMessages.TARGET_SHOULD_BE_BOOLEAN })
   @IsOptional()
-  dark_mode = 0;
+  dark_mode = false;
 
   @IsString({ message: ValidationMessages.TARGET_SHOULD_BE_STRING })
   @IsOptional()
@@ -345,7 +349,8 @@ export class UpdateUserRequest {
   @IsOptional()
   delete_status;
 
-  @IsBoolean({ message: ValidationMessages.TARGET_SHOULD_BE_BOOLEAN })
+  @IsNumber({}, { message: ValidationMessages.TARGET_SHOULD_BE_NUMBER })
+  @IsNumber({}, { message: ValidationMessages.TARGET_SHOULD_BE_NUMBER })
   @IsOptional()
   is_active;
 
@@ -365,11 +370,11 @@ export class UpdateUserRequest {
   @IsOptional()
   updated_at: string;
 
-  @IsNumber({}, { message: ValidationMessages.TARGET_SHOULD_BE_NUMBER })
+  @IsBoolean({ message: ValidationMessages.TARGET_SHOULD_BE_BOOLEAN })
   @IsOptional()
   active_status;
 
-  @IsNumber({}, { message: ValidationMessages.TARGET_SHOULD_BE_NUMBER })
+  @IsBoolean({ message: ValidationMessages.TARGET_SHOULD_BE_BOOLEAN })
   @IsOptional()
   dark_mode;
 

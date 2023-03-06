@@ -1,5 +1,5 @@
 export const ValidationMessages = {
-  USER_DOES_NOT_EXISTS: 'validation.USER_DOES_NOT_EXISTS',
+  USER_NOT_FOUND: 'validation.USER_NOT_FOUND',
   USER_EXISTS: 'validation.USER_EXISTS',
   SOMETHING_WENT_WRONG: 'validation.SOMETHING_WENT_WRONG',
   TARGET_SHOULD_BE_VALID: 'validation.$property_SHOULD_BE_VALID',
@@ -13,5 +13,5 @@ export const ValidationMessages = {
   PERMISSION_EXISTS: 'validation.PERMISSION_EXISTS',
   PERMISSION_NOT_FOUND: 'validation.PERMISSION_NOT_FOUND',
   TARGET_MIN_SIZE_SHOULD_BE_THIS:
-    'validation.TARGET_MIN_SIZE_SHOULD_BE_$constraint1',
+    'validation.$property_MIN_SIZE_SHOULD_BE_$constraint1',
 };
